@@ -1,0 +1,82 @@
+SIGNIFICANT TERMS AGG
+#####
+curl -XGET 'localhost:9200/sports/athlete/_search?pretty' -d '{
+  "query" : {
+    "terms" : {"sport" : [ "basketball" ]}
+  },
+    "aggregations" : {
+      "significantHeight" : {
+        "significant_terms" : { "field" : "height" }
+      }
+    }
+}'
+
+RESPONSE
+#####
+"aggregations" : {
+  "significantHeight" : {
+    "doc_count" : 2781,
+      "buckets" : [ {
+        "key" : 200,
+        "doc_count" : 300,
+        "score" : 0.07077552200011784,
+        "bg_count" : 591
+      }
+
+TERMS AGG / SIG TERMS SUB
+#####
+curl -XGET 'localhost:9200/sports/athlete/_search?pretty' -d '{
+  "aggregations": {
+    "sports": {
+      "terms": {"field": "sport"},
+      "aggregations": {
+        "significantHeight": {
+          "significant_terms": {"field": "height"}
+        }
+      }
+    }
+  }
+}'
+
+-------------------------------------------------------
+
+CARDINALITY AGGREGATION
+#####
+curl -XGET 'localhost:9200/sports/athlete/_search?pretty' -d '{
+  "aggs" : {
+    "author_count" : {
+      "cardinality" : {
+        "field" : "name",
+          "precision_threshold": 100
+      }
+    }
+  }
+}'
+
+-------------------------------------------------------
+
+PERCENTILE AGGREGATION
+#####
+curl -XGET 'localhost:9200/sports/athlete/_search?pretty' -d '{
+    "aggs" : {
+        "rating_overview" : {
+            "percentiles" : {
+                "field" : "rating"
+            }
+        }
+    }
+}'
+
+
+PERCENTILE AGGREGATION 2
+#####
+curl -XGET 'localhost:9200/sports/athlete/_search?pretty' -d '{
+    "aggs" : {
+        "rating_outlier" : {
+            "percentiles" : {
+                "field" : "rating",
+                "percents" : [95, 99, 99.9]
+            }
+        }
+    }
+}'
